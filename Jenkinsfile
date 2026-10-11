@@ -1,23 +1,38 @@
 pipeline {
-  agent any
+  agent {
+    docker {
+      image 'node:24-alpine'
+      args '-u 1000:1000'
+    }
+  }
 
   stages {
-    stage('Build') {
+    stage('Verify runtime') {
       steps {
-        echo 'Building the application...'
+        sh 'node --version'
+        sh 'npm --version'
+      }
+    }
+
+    stage('Install dependencies') {
+      steps {
+        sh 'npm ci'
       }
     }
 
     stage('Test') {
       steps {
-        echo 'Running automated tests...'
+        sh 'npm test'
       }
     }
   }
 
   post {
     success {
-      echo 'Pipeline succeeded.'
+      echo 'CI checks passed.'
+    }
+    failure {
+      echo 'CI checks failed. Review the Console Output.'
     }
   }
 }
