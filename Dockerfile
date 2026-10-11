@@ -1,11 +1,12 @@
-FROM node:19-alpine
-
-COPY package.json /app/
-
-COPY src /app/
+FROM node:24-alpine
 
 WORKDIR /app
 
-RUN npm install 
+COPY package*.json ./
+RUN npm ci --omit=dev
 
-CMD ["node","server.js"]
+COPY src ./src
+
+EXPOSE 3000
+
+CMD ["npm", "start"]
